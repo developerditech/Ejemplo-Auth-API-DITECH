@@ -1,0 +1,52 @@
+<head>
+    <title>Generate Autorization Javascript</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="crypto-js.js"></script>
+    <script src="oauth-1.0a.js"></script>
+</head>
+
+<body>
+    Generate authorization...
+    <script>
+        baseString();
+        function baseString() {
+
+            //SET PARAMS
+            var account_id = '<ACCOUNT>'
+            var _url = 'https://<ACCOUNT>.restlets.api.netsuite.com/app/site/hosting/restlet.nl';
+            var method = 'POST';
+            var scriptid = '<SCRIPTID>';
+            var signature_method = 'HMAC-SHA256';
+            var version = '1.0';
+            var deployid = '<DEPLOYID>';
+            var consumerkey = "<CONSUMERKEY>";
+            var consumersecret = "<CONSUMERSECRET>";
+            var tokenid = "<TOKEN>";
+            var tokensecret = "<TOKENSECRET>";
+            var url = _url + '?script=' + scriptid + '&deploy=' + deployid;
+            var _key = {
+                key: tokenid,
+                secret: tokensecret,
+            }
+
+            //GENERATE BASE STRING AND SIGNATURE
+            var oauth = OAuth({
+                consumer: { key: consumerkey, secret: consumersecret },
+                realm: account_id,
+                signature_method: signature_method,
+                hash_function: hash_function_sha256
+            })
+            var objData = {
+                url: url,
+                method: method
+            }
+            var _oauth = oauth.authorize(objData, _key);
+            var authorization = oauth.toHeader(_oauth)
+            $('body').html(authorization.Authorization);
+        }
+        function hash_function_sha256(baseString, key) {
+            return CryptoJS.HmacSHA256(baseString, key).toString(CryptoJS.enc.Base64)
+        }
+    </script>
+</body>
